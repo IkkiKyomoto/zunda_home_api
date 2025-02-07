@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  voice_vox:
+    image: "voicevox/voicevox_engine:latest"
+    ports:
+      - "50021:50021"
+  api:
+    build: .
+    depends_on:
+      - voice_vox
+    ports:
+      - "80:80"

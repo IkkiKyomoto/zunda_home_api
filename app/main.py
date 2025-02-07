@@ -15,7 +15,7 @@ def get_praise(user_input: str):
     try:
         # praise_text: str = praise.get_praise_text(user_input)
         praise_text: str = "こんにちはなのだ！今日はどんなことを話したいのだ？何か楽しいことがあったのだ？"
-        praise_voice_url: str = praise.get_praise_voice_url(praise_text)
+        praise_voice_url: str = praise.get_praise_voice(praise_text)
         feeling: str = praise.get_feeling(praise_text)
         return {"praise_text": praise_text, "praise_voice_url": praise_voice_url, "feeling": feeling}
     except Exception as e:
