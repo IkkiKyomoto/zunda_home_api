@@ -37,28 +37,21 @@ def get_praise_voice(praise_text: str) -> str:
     
 def get_feeling(praise_text: str) -> str:
     model_name = os.getenv("FEELING_MODEL")
-    max_length = int(os.getenv("FEELING_MAX_LENGTH"))
+    max_length = int(os.getenv("FEELING_MAX_LENGTH", 100))
     if not model_name:
         raise Exception("Model name is required")
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    config = LukeConfig.from_pretrained(model_name, output_hidden_states=True)    
-    model = AutoModelForSequenceClassification.from_pretrained(model_name, config=config)
-    token=tokenizer(praise_text, truncation=True, padding="max_length", max_length=max_length)
-    output=model(torch.tensor(token["input_ids"]).unsqueeze(0), torch.tensor(token["attention_mask"]).unsqueeze(0))
-    max_index = torch.argmax(torch.tensor(output.logits[0])).item()
-    if max_index == 0:
-        return "joy"
-    elif max_index == 1:
-        return "sadness"
-    elif max_index == 2:
-        return "anticipation"
-    elif max_index == 3:
-        return "surprise"
-    elif max_index == 4:
-        return "anger"
-    elif max_index == 5: 
-        return "fear"   
-    elif max_index == 6:
-        return "disgust"
-    elif max_index == 7:
-        return "trust"
+    
+    try:
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        config = LukeConfig.from_pretrained(model_name, output_hidden_states=True)
+        model = AutoModelForSequenceClassification.from_pretrained(model_name, config=config)
+        
+        tokens = tokenizer(praise_text, truncation=True, padding="max_length", max_length=max_length, return_tensors="pt")
+        output = model(**tokens)
+        
+        max_index = torch.argmax(output.logits[0]).item()
+        feelings = ["joy", "sadness", "anticipation", "surprise", "anger", "fear", "disgust", "trust"]
+        
+        return feelings[max_index]
+    except Exception as e:
+        raise Exception(f"Error in processing the model: {e}")

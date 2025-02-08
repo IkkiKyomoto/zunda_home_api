@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+
+  - type: web
+    name: voicevox
+    runtime: docker
+    image: docker.io/voicevox/voicevox_engine:latest
