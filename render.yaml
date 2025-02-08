@@ -3,6 +3,7 @@ services:
     name: api
     runtime: docker
     dockerfilePath: ./Dockerfile
+    region: singapore
 
   - type: web
     name: voicevox
