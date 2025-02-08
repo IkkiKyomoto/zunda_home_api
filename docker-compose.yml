@@ -1,11 +1,16 @@
 version: "3.9"
 services:
   voice_vox:
+    container_name: voicevox
     image: "voicevox/voicevox_engine:latest"
     ports:
       - "50021:50021"
   api:
+    container_name: api
+    env_file:
+      - .env
     build: .
+
     depends_on:
       - voice_vox
     ports:

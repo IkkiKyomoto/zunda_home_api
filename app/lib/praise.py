@@ -3,6 +3,7 @@ from langchain_openai import ChatOpenAI
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, LukeConfig
 import torch
 import requests
+import base64
 
 def get_praise_text(user_input: str) -> str:
     system_message: str = os.getenv("SYSTEM_MESSAGE")
@@ -23,13 +24,16 @@ def get_praise_voice(praise_text: str) -> str:
     speaker_id = 3
     if not voicevox_baseurl:
         raise Exception("Voicevox URL is required")
-    query = requests.post(f"{voicevox_baseurl}/audio_query?text={praise_text}&speaker={speaker_id}")
-    if query.status_code != 200:
-        raise Exception(f"Failed to get audio query: {query.text}")
-    audio_query = query.json()
-    praise_voice = requests.post(f"{voicevox_baseurl}/synthesis?speaker={speaker_id}", json=audio_query)
-    print(praise_voice)
-    return praise_voice.json()
+    try:
+        query = requests.post(f"{voicevox_baseurl}/audio_query?text={praise_text}&speaker={speaker_id}")
+        query.raise_for_status()
+        audio_query = query.json()
+        praise_voice_res = requests.post(f"{voicevox_baseurl}/synthesis?speaker={speaker_id}", json=audio_query)
+        praise_voice_res.raise_for_status()
+        praise_voice = base64.b64encode(praise_voice_res.content).decode()
+        return praise_voice
+    except requests.exceptions.RequestException as e:
+        raise Exception(f"HTTP request failed: {e}")
     
 def get_feeling(praise_text: str) -> str:
     model_name = os.getenv("FEELING_MODEL")
