@@ -5,8 +5,9 @@ services:
     dockerfilePath: ./Dockerfile
     region: singapore
 
-  - type: web
-    name: voicevox
-    runtime: docker
-    image:
-      url: docker.io/voicevox/voicevox_engine:latest
+  # - type: web
+  #   name: voicevox
+  #   runtime: docker
+  #   image:
+  #     url: docker.io/voicevox/voicevox_engine:latest
+  #   region: singapore
