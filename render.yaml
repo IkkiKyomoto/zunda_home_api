@@ -7,7 +7,7 @@ services:
 
   - type: web
     name: voicevox
-    runtime: docker
+    runtime: image
     image:
       url: docker.io/voicevox/voicevox_engine:latest
     region: singapore
