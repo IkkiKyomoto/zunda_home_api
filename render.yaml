@@ -7,4 +7,5 @@ services:
   - type: web
     name: voicevox
     runtime: docker
-    image: docker.io/voicevox/voicevox_engine:latest
+    image:
+      url: docker.io/voicevox/voicevox_engine:latest
