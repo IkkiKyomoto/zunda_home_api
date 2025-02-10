@@ -47,9 +47,7 @@ def get_praise_voice(praise_text: str) -> str:
             synthesis_res = requests.get(f"{voicevox_baseurl}/v3/voicevox/synthesis/?text={praise_text}&speaker={speaker_id}")
             synthesis_res.raise_for_status()
             synthesis_json = synthesis_res.json()
-            print(synthesis_json)
             praise_voice_url = synthesis_json["wavDownloadUrl"]
-            print(praise_voice_url)
             praise_voice_res = requests.get(praise_voice_url)
             praise_voice = base64.b64encode(praise_voice_res.content).decode()
             return praise_voice

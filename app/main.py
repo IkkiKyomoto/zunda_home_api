@@ -14,7 +14,6 @@ def get_praise(user_input: str):
         raise HTTPException(status_code=400, detail="User input is required")
     try:
         praise_text: str = praise.get_praise_text(user_input)
-        praise_text: str = "ユアグレートパーソンなのだ"
         praise_voice: str = praise.get_praise_voice(praise_text)
         feeling: str = praise.get_feeling(praise_text)
         return {"praise_text": praise_text, "praise_voice": praise_voice, "feeling": feeling}
