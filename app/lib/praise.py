@@ -4,6 +4,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification, Luke
 import torch
 import requests
 import base64
+import time
 
 def get_praise_text(user_input: str) -> str:
     system_message: str = os.getenv("SYSTEM_MESSAGE")
@@ -48,25 +49,33 @@ def get_praise_voice(praise_text: str) -> str:
             synthesis_res.raise_for_status()
             synthesis_json = synthesis_res.json()
             praise_voice_url = synthesis_json["wavDownloadUrl"]
+            time.sleep(20)
             praise_voice_res = requests.get(praise_voice_url)
+            praise_voice_res.raise_for_status()
             praise_voice = base64.b64encode(praise_voice_res.content).decode()
             return praise_voice
         except requests.exceptions.RequestException as e:
             raise Exception(f"HTTP request failed: {e}")
     
 def get_feeling(praise_text: str) -> str:
-    model_name = os.getenv("FEELING_MODEL")
-    max_length = int(os.getenv("FEELING_MAX_LENGTH", 100))
-    if not model_name:
-        raise Exception("Model name is required")
-    try:
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        config = LukeConfig.from_pretrained(model_name, output_hidden_states=True)
-        model = AutoModelForSequenceClassification.from_pretrained(model_name, config=config)
-        tokens = tokenizer(praise_text, truncation=True, padding="max_length", max_length=max_length, return_tensors="pt")
-        output = model(**tokens)
-        max_index = torch.argmax(output.logits[0]).item()
-        feelings = ["joy", "sadness", "anticipation", "surprise", "anger", "fear", "disgust", "trust"]
-        return feelings[max_index]
-    except Exception as e:
-        raise Exception(f"Error in processing the model: {e}")
+    feeling_model_use = os.getenv("FEELING_MODEL_USE")
+    if not feeling_model_use:
+        raise Exception("Feeling model use is required")
+    if feeling_model_use == "True":
+        model_name = os.getenv("FEELING_MODEL")
+        max_length = int(os.getenv("FEELING_MAX_LENGTH", 100))
+        if not model_name:
+            raise Exception("Model name is required")
+        try:
+            tokenizer = AutoTokenizer.from_pretrained(model_name)
+            config = LukeConfig.from_pretrained(model_name, output_hidden_states=True)
+            model = AutoModelForSequenceClassification.from_pretrained(model_name, config=config)
+            tokens = tokenizer(praise_text, truncation=True, padding="max_length", max_length=max_length, return_tensors="pt")
+            output = model(**tokens)
+            max_index = torch.argmax(output.logits[0]).item()
+            feelings = ["joy", "sadness", "anticipation", "surprise", "anger", "fear", "disgust", "trust"]
+            return feelings[max_index]
+        except Exception as e:
+            raise Exception(f"Error in processing the model: {e}")
+    else:
+        return "not_use"
