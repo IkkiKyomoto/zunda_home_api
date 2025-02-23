@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from lib import praise
 import logging
 from pathlib import Path
+import json
 
 app = FastAPI()
 
@@ -31,7 +32,8 @@ def get_praise_mock(user_input: str):
         path = base_path / "mock" / "body.txt"
         with open(path, "r") as f:
             data = f.read()
-        return data
+            return json.loads(data)
+
     except Exception as e:
         logger.error(f"Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
